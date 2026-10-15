@@ -18,9 +18,11 @@ def main():
     hdr = root / "supercell/dsp/granular_processor.h"
     cpp = root / "supercell/dsp/granular_processor.cc"
     dest = root / "supercell/dsp/ambient_modes.h"
+    application = root / "supercell/supercell.cc"
     if not hdr.is_file() or not cpp.is_file() or dest.exists():
         raise RuntimeError("Missing source files, or ambient header already installed.")
     h, c = hdr.read_text(), cpp.read_text()
+    app_source = application.read_text()
     h = replace_one(h, '#include "supercell/dsp/granular_processor.h"',
                     '#include "supercell/dsp/granular_processor.h"\n#include "supercell/dsp/ambient_modes.h"', hdr)
     h = replace_one(h, '  Parameters parameters_;',
@@ -49,10 +51,17 @@ def main():
     # Modern arm-none-eabi-g++ correctly rejects this as C++ narrowing.
     c = replace_one(c, '          0.0f, // freeze;', '          false, // freeze;', cpp)
     c = replace_one(c, '          0.0f // gate;', '          false // gate;', cpp)
+    # Modern GCC emits the C++14 sized delete overload for virtual destructors.
+    # Stock upstream defines only the unsized form; provide the same no-op overload.
+    app_source = replace_one(app_source,
+                             'void operator delete(void * p) { }',
+                             'void operator delete(void * p) { }\\nvoid operator delete(void * p, size_t) { }',
+                             application)
     # No writes until all exact source anchors have been verified.
     dest.write_text((pkg / 'ambient_modes.h').read_text())
     hdr.write_text(h)
     cpp.write_text(c)
+    application.write_text(app_source)
     print("Ambient Edition patch applied:", root)
 
 if __name__ == "__main__":
