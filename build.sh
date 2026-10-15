@@ -23,7 +23,7 @@ fi
 python3 "$BASE_DIR/install_patch.py" "$SRC"
 # The legacy 2016 toolchain makefile uses an unsupported -mthumb-interwork flag.
 TOOLCHAIN_DIR="$(dirname "$(dirname "$(command -v arm-none-eabi-gcc)")")/"
-ARCHFLAGS="-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -funroll-loops -fno-strict-aliasing -Wno-error=deprecated"
+ARCHFLAGS="-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -funroll-loops -fno-strict-aliasing -Wno-error"
 mkdir -p build/microcell
 make -f supercell/makefile -j2 VARIANT=MICROCELL TOOLCHAIN_PATH="$TOOLCHAIN_DIR" ARCHFLAGS="$ARCHFLAGS" build/microcell/microcell.bin
 cp build/microcell/microcell.bin "$OUT/neoclo-typhoon-microcell-EXPERIMENTAL.bin"
