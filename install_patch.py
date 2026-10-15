@@ -55,7 +55,7 @@ def main():
     # Stock upstream defines only the unsized form; provide the same no-op overload.
     app_source = replace_one(app_source,
                              'void operator delete(void * p) { }',
-                             'void operator delete(void * p) { }\\nvoid operator delete(void * p, size_t) { }',
+                             'void operator delete(void * p) { }\nvoid operator delete(void * p, size_t) { }',
                              application)
     # No writes until all exact source anchors have been verified.
     dest.write_text((pkg / 'ambient_modes.h').read_text())
