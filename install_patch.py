@@ -45,6 +45,10 @@ def main():
                     '  if (playback_mode_ != PLAYBACK_MODE_OLIVERB &&\n'
                     '      playback_mode_ != PLAYBACK_MODE_RESONESTOR) {\n'
                     '    float reverb_amount = parameters_.reverb;', cpp)
+    # Older SuperParasites sources used float literals for aggregate bool fields.
+    # Modern arm-none-eabi-g++ correctly rejects this as C++ narrowing.
+    c = replace_one(c, '          0.0f, // freeze;', '          false, // freeze;', cpp)
+    c = replace_one(c, '          0.0f // gate;', '          false // gate;', cpp)
     # No writes until all exact source anchors have been verified.
     dest.write_text((pkg / 'ambient_modes.h').read_text())
     hdr.write_text(h)
