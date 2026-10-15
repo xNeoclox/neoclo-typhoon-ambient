@@ -1,0 +1,31 @@
+name: Build experimental Typhoon Microcell firmware
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install compiler and WAV dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi git make g++ python3-pip python3-venv
+          python3 -m pip install --user numpy
+      - name: Build firmware
+        run: |
+          chmod +x build.sh
+          ./build.sh
+      - name: Upload experimental artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: neoclo-typhoon-experimental-microcell
+          path: |
+            dist/neoclo-typhoon-microcell-EXPERIMENTAL.bin
+            dist/neoclo-typhoon-microcell-EXPERIMENTAL.wav
+            dist/firmware-size.txt
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
